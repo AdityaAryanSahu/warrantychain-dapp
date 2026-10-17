@@ -1,0 +1,17 @@
+{
+  "name": "warrantychain-dapp",
+  "version": "1.0.0",
+  "description": "WarrantyChain - a decentralised product warranty registry built with Solidity, Ethers.js and MetaMask",
+  "private": true,
+  "scripts": {
+    "compile": "node scripts/compile.js",
+    "test": "node scripts/compile.js && node tests/warrantychain.test.js",
+    "start": "npx http-server frontend -p 8080 -c-1"
+  },
+  "devDependencies": {
+    "ethers": "6.13.4",
+    "ganache": "7.9.2",
+    "solc": "0.8.26"
+  },
+  "license": "MIT"
+}

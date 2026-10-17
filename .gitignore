@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Secrets - never commit private keys, seed phrases or passwords
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+mnemonic.txt
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Office temp files
+~$*.docx

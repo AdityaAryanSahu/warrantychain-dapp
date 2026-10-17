@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WarrantyChain | Decentralised Warranty Registry</title>
+  <link rel="stylesheet" href="style.css?v=3" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">WC</span>
+      <div>
+        <h1>WarrantyChain</h1>
+        <p class="tagline">Tamper-proof product warranties on Ethereum</p>
+      </div>
+    </div>
+    <div class="wallet">
+      <div id="walletInfo" class="wallet-info hidden">
+        <span id="roleBadge" class="badge">-</span>
+        <span id="accountAddress" class="mono">-</span>
+        <span id="networkName" class="network">-</span>
+      </div>
+      <button id="connectBtn" class="btn primary">Connect MetaMask</button>
+    </div>
+  </header>
+
+  <div id="networkWarning" class="banner warn hidden"></div>
+
+  <main>
+    <!-- ======= Contract overview (blockchain data) ======= -->
+    <section class="card overview">
+      <div class="card-head">
+        <h2>Contract Overview</h2>
+        <button id="refreshBtn" class="btn ghost small">Refresh</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="label">Brand</span><span id="statBrand" class="value">-</span></div>
+        <div class="stat"><span class="label">Products</span><span id="statProducts" class="value">-</span></div>
+        <div class="stat"><span class="label">Claims</span><span id="statClaims" class="value">-</span></div>
+        <div class="stat"><span class="label">Pending claims</span><span id="statPending" class="value">-</span></div>
+        <div class="stat"><span class="label">Retailers</span><span id="statRetailers" class="value">-</span></div>
+        <div class="stat"><span class="label">Max warranty</span><span id="statMaxWarranty" class="value">-</span></div>
+      </div>
+      <p class="meta">Contract: <span id="contractAddress" class="mono">-</span></p>
+      <p class="meta">Manufacturer: <span id="manufacturerAddress" class="mono">-</span></p>
+    </section>
+
+    <p class="hint">
+      All panels are visible to every account so that role checks can be tested.
+      An action outside your role is rejected by the smart contract, and the
+      reason is shown in the activity log.
+    </p>
+    <label class="force-send">
+      <input id="forceSend" type="checkbox" />
+      Force send (skip gas estimation). The transaction is mined even if it reverts,
+      so a failed transaction is recorded on-chain and in MetaMask.
+    </label>
+
+    <div class="grid">
+      <!-- ======= Manufacturer ======= -->
+      <section class="card role-manufacturer">
+        <h2>Manufacturer <span class="pill">owner only</span></h2>
+
+        <form id="addRetailerForm" class="form">
+          <h3>Authorise retailer</h3>
+          <label>Retailer wallet address
+            <input id="retailerAddress" type="text" placeholder="0x..." />
+          </label>
+          <label>Retailer name
+            <input id="retailerNameInput" type="text" placeholder="e.g. City Electronics" />
+          </label>
+          <button class="btn primary" type="submit">Add retailer</button>
+        </form>
+
+        <form id="removeRetailerForm" class="form">
+          <h3>Revoke retailer</h3>
+          <label>Retailer wallet address
+            <input id="removeRetailerAddress" type="text" placeholder="0x..." />
+          </label>
+          <button class="btn danger" type="submit">Remove retailer</button>
+        </form>
+
+        <form id="resolveClaimForm" class="form">
+          <h3>Resolve warranty claim</h3>
+          <label>Claim ID
+            <input id="resolveClaimId" type="number" min="1" placeholder="1" />
+          </label>
+          <label>Decision
+            <select id="resolveDecision">
+              <option value="approve">Approve (repair / replace)</option>
+              <option value="reject">Reject</option>
+            </select>
+          </label>
+          <label>Resolution note
+            <input id="resolveNote" type="text" placeholder="e.g. Screen replaced at service centre" />
+          </label>
+          <button class="btn primary" type="submit">Submit decision</button>
+        </form>
+      </section>
+
+      <!-- ======= Retailer ======= -->
+      <section class="card role-retailer">
+        <h2>Retailer <span class="pill">authorised retailers only</span></h2>
+        <form id="registerProductForm" class="form">
+          <h3>Register a sold product</h3>
+          <label>Serial number
+            <input id="serialNumber" type="text" placeholder="e.g. SN-2026-0001" />
+          </label>
+          <label>Model
+            <input id="model" type="text" placeholder="e.g. AirMax Laptop 14" />
+          </label>
+          <label>Buyer wallet address
+            <input id="buyerAddress" type="text" placeholder="0x..." />
+          </label>
+          <label>Warranty period (months)
+            <input id="warrantyMonths" type="number" min="1" placeholder="12" />
+          </label>
+          <button class="btn primary" type="submit">Register product</button>
+        </form>
+      </section>
+
+      <!-- ======= Customer ======= -->
+      <section class="card role-customer">
+        <h2>Product Owner <span class="pill">owner of the product</span></h2>
+
+        <form id="fileClaimForm" class="form">
+          <h3>File a warranty claim</h3>
+          <label>Product ID
+            <input id="claimProductId" type="number" min="1" placeholder="1" />
+          </label>
+          <label>Issue description
+            <textarea id="claimIssue" rows="3" placeholder="Describe the fault (max 280 characters)"></textarea>
+          </label>
+          <button class="btn primary" type="submit">File claim</button>
+        </form>
+
+        <form id="transferForm" class="form">
+          <h3>Transfer warranty (resale)</h3>
+          <label>Product ID
+            <input id="transferProductId" type="number" min="1" placeholder="1" />
+          </label>
+          <label>New owner wallet address
+            <input id="newOwnerAddress" type="text" placeholder="0x..." />
+          </label>
+          <button class="btn primary" type="submit">Transfer</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- ======= My products ======= -->
+    <section class="card">
+      <div class="card-head">
+        <h2>My Products</h2>
+        <span class="meta">Products owned by the connected wallet</span>
+      </div>
+      <div id="myProducts" class="product-list"><p class="empty">Connect your wallet to load your products.</p></div>
+    </section>
+
+    <!-- ======= Public lookups ======= -->
+    <div class="grid two">
+      <section class="card">
+        <h2>Verify Serial Number <span class="pill public">public</span></h2>
+        <form id="verifyForm" class="form inline">
+          <input id="verifySerialInput" type="text" placeholder="Enter serial number" />
+          <button class="btn primary" type="submit">Verify</button>
+        </form>
+        <div id="verifyResult" class="result"></div>
+      </section>
+
+      <section class="card">
+        <h2>Look Up Product / Claim <span class="pill public">public</span></h2>
+        <form id="lookupProductForm" class="form inline">
+          <input id="lookupProductId" type="number" min="1" placeholder="Product ID" />
+          <button class="btn primary" type="submit">Get product</button>
+        </form>
+        <form id="lookupClaimForm" class="form inline">
+          <input id="lookupClaimId" type="number" min="1" placeholder="Claim ID" />
+          <button class="btn primary" type="submit">Get claim</button>
+        </form>
+        <div id="lookupResult" class="result"></div>
+      </section>
+    </div>
+
+    <!-- ======= Activity log ======= -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Activity Log</h2>
+        <button id="clearLogBtn" class="btn ghost small">Clear</button>
+      </div>
+      <ul id="log" class="log"></ul>
+    </section>
+  </main>
+
+  <footer>
+    WarrantyChain DApp &middot; CSE4444 Blockchain Technology &middot; Assignment 2
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+  <script src="config.js?v=3"></script>
+  <script src="abi.js?v=3"></script>
+  <script src="app.js?v=3"></script>
+</body>
+</html>
