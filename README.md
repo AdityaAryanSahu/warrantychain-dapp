@@ -1,6 +1,6 @@
 # WarrantyChain - Decentralised Product Warranty Registry
 
-> **Course:** Blockchain Technology (CSE4444) - Assignment 2
+> **Course:** Blockchain Technology (CSE4444) - Assignment 2 |
 > **Student:** Aditya  Aryan Sahu | **Registration No.:** 230905560
 
 WarrantyChain is a decentralised application (DApp) built on Ethereum that
